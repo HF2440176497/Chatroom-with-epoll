@@ -46,7 +46,7 @@ int SetnonBlocking(int sockfd) {
  */
 void addfd(int epfd, int connfd, const struct sockaddr_in &cliieaddr) {
     printf("ID: %d at port: %d has been connected... \n", connfd, ntohs(cliieaddr.sin_port));
-    printf("Now we have %d users \n", clients_list.size());
+    printf("Now we have %ld users \n", clients_list.size()+1);
     send(connfd, WELCOME, strlen(WELCOME), 0);
 
     struct epoll_event conn_event;
@@ -90,7 +90,7 @@ int BroadcastMessage(int epfd, int rfd) {
             for (auto client:clients_list) {
                 if (client == rfd)
                     continue;
-                if (send(rfd, message_buf, BUF_SIZE, 0) < 0)
+                if (send(client, message_buf, strlen(message_buf), 0) < 0)
                     return -1;
             }
         }
@@ -112,7 +112,7 @@ int main() {
     int ret = bind(listenfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
     assert(ret != -1);
 
-    int ret = listen(listenfd, 5);
+    ret = listen(listenfd, 5);
     assert(ret != -1);
 
     int epfd = epoll_create(CLIENT_SIZE);

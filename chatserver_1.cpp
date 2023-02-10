@@ -45,7 +45,7 @@ int SetnonBlocking(int sockfd) {
  * @param cliieaddr 
  */
 void addfd(int epfd, int connfd, const struct sockaddr_in &cliieaddr) {
-    printf("ID: %d at port: %d has been connected... \n", connfd, cliieaddr.sin_port);
+    printf("ID: %d at port: %d has been connected... \n", connfd, ntohs(cliieaddr.sin_port));
     printf("Now we have %d users \n", clients_list.size());
     send(connfd, WELCOME, strlen(WELCOME), 0);
 
@@ -70,7 +70,7 @@ int BroadcastMessage(int epfd, int rfd) {
         int n = recv(rfd, message_buf, BUF_SIZE - 1, 0);
         if (n < 0) {
             if (errno == EAGAIN || errno == EWOULDBLOCK) {  // 读取完成最后进入此分支
-                printf("Read alreday down. Waiting for calling later \n");
+                printf("Read alreday down. Waiting for calling later ... \n\n");
                 break;  // 应当跳出 while 
             } else {
                 close(rfd);
